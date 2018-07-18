@@ -1,1 +1,1 @@
-worker:python test-bot_3.7.py
+worker: python test-bot_3.7.py
