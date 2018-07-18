@@ -19,6 +19,13 @@ async def on_message(message):
         embed.set_author(name = title, icon_url = avatar_url)
         await client.send_message(message.channel, embed = embed)
 
+    if message.content.startswith('!hello'):
+        title = 'Hello'
+        description = "`This is a test.`"
+        embed = discord.Embed(description = description, colour = 0xBECCE0)
+        embed.set_author(name = title, icon_url = avatar_url)
+        await client.send_message(message.channel, embed = embed)
+
     if message.content.startswith('b!help'):
         title = 'The current commands for the Boundless section are:'
         helpDistances = "b!distances - display distances inbetween planets on a server"
