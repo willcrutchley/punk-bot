@@ -1,4 +1,4 @@
-import asyncio, discord, os
+import asyncio, discord, os, pickle
 TOKEN = 'NDY4ODM1NDAxODE0MTE0MzA0.DjAHiA.Y-6dmYg3pTb52vYfwwRg1ifXWFc'
 
 client = discord.Client()
@@ -46,20 +46,21 @@ async def on_message(message):
                         break
                 for item in inputItems:
                     await client.send_message(message.channel, item)
-                    await client.send_message(message.channel, inputItems.index(item))
+                    await client.send_message(message.channel, inputQuantities[inputItems.index(item)])
             else:
                 title = "Error!"
                 description = "There is no recipe for that item"
                 embed = discord.Embed(description = description, colour = 0xDC5A46)
                 embed.set_author(name = title, icon_url = avatar_url)
                 await client.send_message(message.channel, embed = embed)
+    
         except:
             title = "Error!"
             description = "The correct usage is `b!recipe outputItem`"
             embed = discord.Embed(description = description, colour = 0xDC5A46)
             embed.set_author(name = title, icon_url = avatar_url)
             await client.send_message(message.channel, embed = embed)
-
+    
     if message.content.startswith('b!help'):
         title = 'The current commands for the Boundless section are:'
         helpDistances = "b!distances - display distances inbetween planets on a server"
