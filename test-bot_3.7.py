@@ -19,6 +19,47 @@ async def on_message(message):
         embed.set_author(name = title, icon_url = avatar_url)
         await client.send_message(message.channel, embed = embed)
 
+    if message.content.startswith("b!recipe"):
+        args = message.content.split(" ")
+        try:
+            outputItem = args[1]
+            outputItem = outputItem.upper()
+
+            with open ("outputs", "rb") as fp:
+                outputs = pickle.load(fp)
+            with open ("jsonData", "rb") as jd:
+                data = pickle.load(jd)
+            if outputItem in outputs:
+                index = outputs.index(outputItem)
+
+                inputs = data["recipes"][index]["inputs"]
+
+                n = 0
+                inputItems = []
+                inputQuantities = []
+                while True:
+                    try:
+                        inputItems.append(inputs[n]["inputItem"])
+                        inputQuantities.append(inputs[n]["inputQuantity"])
+                        n += 1
+                    except:
+                        break
+                for item in inputItems:
+                    await client.send_message(message.channel, item)
+                    await client.send_message(message.channel, inputItems.index(item))
+            else:
+                title = "Error!"
+                description = "There is no recipe for that item"
+                embed = discord.Embed(description = description, colour = 0xDC5A46)
+                embed.set_author(name = title, icon_url = avatar_url)
+                await client.send_message(message.channel, embed = embed)
+        except:
+            title = "Error!"
+            description = "The correct usage is `b!recipe outputItem`"
+            embed = discord.Embed(description = description, colour = 0xDC5A46)
+            embed.set_author(name = title, icon_url = avatar_url)
+            await client.send_message(message.channel, embed = embed)
+
     if message.content.startswith('b!help'):
         title = 'The current commands for the Boundless section are:'
         helpDistances = "b!distances - display distances inbetween planets on a server"

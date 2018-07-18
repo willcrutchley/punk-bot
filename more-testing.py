@@ -1,13 +1,12 @@
 import json, pickle
 
-with open("recipes.json", "r") as infile:
-    data = json.load(infile)
-
 n = 0
 outputs = []
 
 choice = input("Generate new list? Y/n")
 if choice.lower() == 'y':
+    with open("recipes.json", "r") as infile:
+        data = json.load(infile)
     while True:
         try:
             outputs.append(data["recipes"][n]["outputItem"])
@@ -17,9 +16,13 @@ if choice.lower() == 'y':
             break
     with open('outputs', 'wb') as fp:
         pickle.dump(outputs, fp)
+    with open('jsonData', 'wb') as jd:
+        pickle.dump(data, jd)
 elif choice.lower() == 'n':
     with open ('outputs', 'rb') as fp:
         outputs = pickle.load(fp)
+    with open ('jsonData', 'rb') as jd:
+        data = pickle.load(jd)
 else:
     print("Invalid response")
     exit
