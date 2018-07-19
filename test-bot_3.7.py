@@ -94,6 +94,9 @@ async def on_message(message):
             outputItem = outputItem.upper()
             string = False
 
+        outputItem = outputItem.replace("Bag Of", "Bag of")
+        
+        await client.send_message(message.channel, outputItem)
         if outputItem in outputs or outputItem in vals:
             if string == True:
                 for key, value in strings.items():    
@@ -102,7 +105,7 @@ async def on_message(message):
                         outputItem = outputItem[10:]
                         index = outputs.index(outputItem)
             else:
-                index = outputs.index(outputs[outputItem])
+                index = outputs.index(outputItem)
 
             inputs = data["recipes"][index]["inputs"]
             n = 0
@@ -117,39 +120,30 @@ async def on_message(message):
                 except:
                     try:
                         skill = data["recipes"][index]["prerequisites"]
-                        skill = skill[0].replace(" ", "_")
+                        skill = str(skill[0]).replace(" ", "_")
                         skillName = vals[keys.index("GUI_SKILLS_" + skill.upper() + "_TITLE")]
                     except:
-                        skillName = "None"         
+                        skill = "N/A"
+                        skillName = skill
                     try:
                         machine = data["recipes"][index]["machine"]
                         machine = machine.replace("_", "")
-                        machineName = vals[keys.index("ITEM_TYPE_MACHINE_" + machine.upper() + "_BASE")]
-                        hand = data["recipes"][index]["canHandCraft"]
-                        duration = data["recipes"][index]["duration"]
-                        power = data["recipes"][index]["powerRequired"]
-                        spark = data["recipes"][index]["spark"]
-                        wear = data["recipes"][index]["wear"]
-                        output = data["recipes"][index]["outputItem"]
-                        outputName = vals[keys.index("ITEM_TYPE_" + output.upper())]
-                        outputNum = data["recipes"][index]["outputQuantity"]
-                        handcraftable = data["recipes"][index]["canHandCraft"]
+                        if machine.lower() != "furnace":
+                            machineName = vals[keys.index("ITEM_TYPE_MACHINE_" + machine.upper() + "_BASE")]
+                        else:
+                            machine = "Furnace"
+                            machineName = "Furnace"
                     except:
                         machine = "N/A"
-                        machineName = "N/A"
-                        hand = data["recipes"][index]["canHandCraft"]
-                        duration = data["recipes"][index]["duration"]
-                        power = data["recipes"][index]["powerRequired"]
-                        spark = data["recipes"][index]["spark"]
-                        wear = data["recipes"][index]["wear"]
-                        output = data["recipes"][index]["outputItem"]
-                        outputName = vals[keys.index("ITEM_TYPE_" + output.upper())]
-                        outputNum = data["recipes"][index]["outputQuantity"]
-                        handcraftable = data["recipes"][index]["canHandCraft"]
-                    if str(handcraftable).lower() == "true":
-                        handcraftable = "Yes"
-                    else:
-                        handcraftable = "No"
+                        machineName = machine
+                    handcraftable = str(data["recipes"][index]["canHandCraft"])
+                    duration = data["recipes"][index]["duration"]
+                    power = data["recipes"][index]["powerRequired"]
+                    spark = data["recipes"][index]["spark"]
+                    wear = data["recipes"][index]["wear"]
+                    output = data["recipes"][index]["outputItem"]
+                    outputName = vals[keys.index("ITEM_TYPE_" + output.upper())]
+                    outputNum = data["recipes"][index]["outputQuantity"]
                     break
             out = PrettyTable(["Outputs:", "Normal", "Bulk", "Mass"])
             out.add_row([outputName, outputNum[0], outputNum[1], outputNum[2]])

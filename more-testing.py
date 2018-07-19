@@ -66,12 +66,24 @@ while True:
         inputQuantities.append(inputs[n]["inputQuantity"])
         n += 1
     except:
-        skill = data["recipes"][index]["prerequisites"]
-        skill = skill[0].replace(" ", "_")
-        skillName = vals[keys.index("GUI_SKILLS_" + skill.upper() + "_TITLE")]
-        machine = data["recipes"][index]["machine"]
-        machine = machine.replace("_", "")
-        machineName = vals[keys.index("ITEM_TYPE_MACHINE_" + machine.upper() + "_BASE")]
+        try:
+            skill = data["recipes"][index]["prerequisites"]
+            skill = str(skill[0]).replace(" ", "_")
+            skillName = vals[keys.index("GUI_SKILLS_" + skill.upper() + "_TITLE")]
+        except:
+            skill = "N/A"
+            skillName = skill
+        try:
+            machine = data["recipes"][index]["machine"]
+            machine = machine.replace("_", "")
+            if machine.lower() != "furnace":
+                machineName = vals[keys.index("ITEM_TYPE_MACHINE_" + machine.upper() + "_BASE")]
+            else:
+                machine = "Furnace"
+                machineName = "Furnace"
+        except:
+            machine = "N/A"
+            machineName = machine
         hand = data["recipes"][index]["canHandCraft"]
         duration = data["recipes"][index]["duration"]
         power = data["recipes"][index]["powerRequired"]
@@ -84,7 +96,7 @@ while True:
 out = PrettyTable(["Outputs:", "Normal", "Bulk", "Mass"])
 out.add_row([outputName, outputNum[0], outputNum[1], outputNum[2]])
 
-table = PrettyTable(["Requires:", "Normal", "Bulk", "Mass"])
+table = PrettyTable(["Takes:", "Normal", "Bulk", "Mass"])
 table.align["Requires:"] = "l"
 
 for item in inputItems:
@@ -96,13 +108,15 @@ for item in inputItems:
         table.add_row([name, nor, bul, mas])
     else:
         table.add_row([item, nor, bul, mas])
-        
-spark_nor = spark[0]
-spark_bul = spark[1]
-spark_mas = spark[2]
 
-table.add_row(["Spark", spark_nor, spark_bul, spark_mas])
-table.add_row(["Power", power, power, power])
+if spark[2] == 0:
+    pass
+else:
+    table.add_row(["Spark", spark[0], spark[1], spark[2]])
+if power == 0:
+    pass
+else:
+    table.add_row(["Power", power, power, power])
 table.add_row(["Time", str(duration[0]) + 's', str(duration[1]) + 's', str(duration[2]) + 's'])
 
 print("Recipe for " + outputName)
