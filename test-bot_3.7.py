@@ -96,7 +96,6 @@ async def on_message(message):
 
         outputItem = outputItem.replace("Bag Of", "Bag of")
         
-        await client.send_message(message.channel, outputItem)
         if outputItem in outputs or outputItem in vals:
             if string == True:
                 for key, value in strings.items():    
