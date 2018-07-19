@@ -7,6 +7,8 @@ choice = input("Generate new list? Y/n")
 if choice.lower() == 'y':
     with open("recipes.json", "r") as infile:
         data = json.load(infile)
+    with open("strings.json", "r") as names:
+        strings = json.load(names)
     while True:
         try:
             outputs.append(data["recipes"][n]["outputItem"])
@@ -18,11 +20,16 @@ if choice.lower() == 'y':
         pickle.dump(outputs, fp)
     with open('jsonData', 'wb') as jd:
         pickle.dump(data, jd)
+    with open('strings', 'wb') as st:
+        pickle.dump(strings, st)
 elif choice.lower() == 'n':
     with open ('outputs', 'rb') as fp:
         outputs = pickle.load(fp)
     with open ('jsonData', 'rb') as jd:
         data = pickle.load(jd)
+    with open ('strings', 'rb') as st:
+        strings = pickle.load(st)
+        print(strings)
 else:
     print("Invalid response")
     exit
