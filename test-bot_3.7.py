@@ -66,74 +66,146 @@ async def on_message(message):
 
     async def brecipes():
         args = message.content.split(" ")
-        try:
+        #try:
+        with open ('outputs', 'rb') as fp:
+            outputs = pickle.load(fp)
+        with open ('jsonData', 'rb') as jd:
+            data = pickle.load(jd)
+        with open ('strings', 'rb') as st:
+            strings = pickle.load(st)
+        with open ('keys', 'rb') as ky:
+            keys = pickle.load(ky)
+        with open ('vals', 'rb') as vl:
+            vals = pickle.load(vl)
+
+        if len(args) > 2:
+            args.pop(0)
+            arg = " ".join(args)
+            arg = arg.lower().title()
+            outputItem = arg
+            string = True
+        elif "_" not in args[1]:
+            arg = args[1]
+            arg = arg.lower().title()
+            outputItem = arg
+            string = True
+        else:
             outputItem = args[1]
             outputItem = outputItem.upper()
+            string = False
 
-            with open ("outputs", "rb") as fp:
-                outputs = pickle.load(fp)
-            with open ("jsonData", "rb") as jd:
-                data = pickle.load(jd)
-            if outputItem in outputs:
-                index = outputs.index(outputItem)
+        if outputItem in outputs or outputItem in vals:
+            if string == True:
+                for key, value in strings.items():    
+                    if value == outputItem:
+                        outputItem = key
+                        outputItem = outputItem[10:]
+                        index = outputs.index(outputItem)
+            else:
+                index = outputs.index(outputs[outputItem])
 
-                inputs = data["recipes"][index]["inputs"]
-
-                n = 0
-                inputItems = []
-                inputQuantities = []
-                skills = []
-                while True:
+            inputs = data["recipes"][index]["inputs"]
+            n = 0
+            inputItems = []
+            inputQuantities = []
+            skills = []
+            while True:
+                try:
+                    inputItems.append(inputs[n]["inputItem"])
+                    inputQuantities.append(inputs[n]["inputQuantity"])
+                    n += 1
+                except:
                     try:
-                        inputItems.append(inputs[n]["inputItem"])
-                        inputQuantities.append(inputs[n]["inputQuantity"])
-                        n += 1
+                        skill = data["recipes"][index]["prerequisites"]
+                        skill = skill[0].replace(" ", "_")
+                        skillName = vals[keys.index("GUI_SKILLS_" + skill.upper() + "_TITLE")]
                     except:
-                        skills.append(data["recipes"][index]["prerequisites"])
+                        skillName = "None"         
+                    try:
                         machine = data["recipes"][index]["machine"]
+                        machine = machine.replace("_", "")
+                        machineName = vals[keys.index("ITEM_TYPE_MACHINE_" + machine.upper() + "_BASE")]
                         hand = data["recipes"][index]["canHandCraft"]
                         duration = data["recipes"][index]["duration"]
                         power = data["recipes"][index]["powerRequired"]
                         spark = data["recipes"][index]["spark"]
                         wear = data["recipes"][index]["wear"]
                         output = data["recipes"][index]["outputItem"]
+                        outputName = vals[keys.index("ITEM_TYPE_" + output.upper())]
                         outputNum = data["recipes"][index]["outputQuantity"]
-                        break
-                out = PrettyTable(["Outputs:", "Normal", "Bulk", "Mass"])
-                out.add_row([output, outputNum[0], outputNum[1], outputNum[2]])
-                
-                table = PrettyTable(["Requires:", "Normal", "Bulk", "Mass"])
-                table.align["Requires:"] = "l"
-                for item in inputItems:
-                    nor = inputQuantities[inputItems.index(item)][0]
-                    bul = inputQuantities[inputItems.index(item)][1]
-                    mas = inputQuantities[inputItems.index(item)][2]
-        
+                        handcraftable = data["recipes"][index]["canHandCraft"]
+                    except:
+                        machine = "N/A"
+                        machineName = "N/A"
+                        hand = data["recipes"][index]["canHandCraft"]
+                        duration = data["recipes"][index]["duration"]
+                        power = data["recipes"][index]["powerRequired"]
+                        spark = data["recipes"][index]["spark"]
+                        wear = data["recipes"][index]["wear"]
+                        output = data["recipes"][index]["outputItem"]
+                        outputName = vals[keys.index("ITEM_TYPE_" + output.upper())]
+                        outputNum = data["recipes"][index]["outputQuantity"]
+                        handcraftable = data["recipes"][index]["canHandCraft"]
+                    if str(handcraftable).lower() == "true":
+                        handcraftable = "Yes"
+                    else:
+                        handcraftable = "No"
+                    break
+            out = PrettyTable(["Outputs:", "Normal", "Bulk", "Mass"])
+            out.add_row([outputName, outputNum[0], outputNum[1], outputNum[2]])
+            
+            table = PrettyTable(["Requires:", "Normal", "Bulk", "Mass"])
+            table.align["Requires:"] = "l"
+            for item in inputItems:
+                nor = inputQuantities[inputItems.index(item)][0]
+                bul = inputQuantities[inputItems.index(item)][1]
+                mas = inputQuantities[inputItems.index(item)][2]
+                if "ITEM_TYPE_" + item.upper() in keys:
+                    name = vals[keys.index("ITEM_TYPE_" + item.upper())]
+                    table.add_row([name, nor, bul, mas])
+                else:
                     table.add_row([item, nor, bul, mas])
-                table.add_row(["Spark", spark[0], spark[1], spark[2]])
-                table.add_row(["Power", power, power, power])
-                table.add_row(["Time", str(duration[0]) + 's', str(duration[1]) + 's', str(duration[2]) + 's'])
-
-                embed = discord.Embed(description = "`" + out.get_string() + "`" + "\n" + "`" + table.get_string() + "`", colour = 0xAE86C4)
-                embed.set_author(name = "Recipe for " + output, icon_url = avatar_url)
-                embed.set_footer(text = str(skills[0]) + "\n" + machine)
-
-                await client.send_message(message.channel, embed = embed)
-                
+            if machine.lower() == "furnace":
+                table.add_row(["Heat", spark[0], spark[1], spark[2]])
+            elif machine.lower() == "craftingtable":
+                pass
+            elif machine.lower() == "n/a":
+                pass
             else:
-                title = "Error!"
-                description = "There is no recipe for that item"
-                embed = discord.Embed(description = description, colour = 0xDC5A46)
-                embed.set_author(name = str(title), icon_url = avatar_url)
-                await client.send_message(message.channel, embed = embed)
-        
+                if int(spark[2]) == 0:
+                    pass
+                else:
+                    table.add_row(["Spark", spark[0], spark[1], spark[2]])
+                if int(power) == 0:
+                    pass
+                else:
+                    table.add_row(["Power", power, power, power])
+
+            table.add_row(["Time", str(duration[0]) + 's', str(duration[1]) + 's', str(duration[2]) + 's'])
+
+            embed = discord.Embed(description = "`" + out.get_string() + "`" + "\n" + "`" + table.get_string() + "`", colour = 0xAE86C4)
+            embed.set_author(name = "Recipe for " + outputName, icon_url = avatar_url)
+            if machine.lower() == "craftingtable" or machine.lower() == "n/a":
+                embed.set_footer(text = "Skill Needed:- " + str(skillName) + " /  Machine used:- " + machineName + " /  Handcraftable:- " + handcraftable)
+            else:
+                embed.set_footer(text = "Skill Needed:- " + str(skillName) + " /  Machine used:- " + machineName)
+
+            await client.send_message(message.channel, embed = embed)
+            
+        else:
+            title = "Error!"
+            description = "There is no recipe for that item"
+            embed = discord.Embed(description = description, colour = 0xDC5A46)
+            embed.set_author(name = str(title), icon_url = avatar_url)
+            await client.send_message(message.channel, embed = embed)
+        '''
         except:
             title = "Incorrect usage!"
             description = "The correct usage is `b!recipe outputItem`"
             embed = discord.Embed(description = description, colour = 0xDC5A46)
             embed.set_author(name = title, icon_url = avatar_url)
             await client.send_message(message.channel, embed = embed)
-        
+        '''
 
     async def bdistance(server):
             title = "Here are the distances between planets on Boundless' " + server + " server:"
