@@ -16,7 +16,7 @@ async def on_message(message):
         helpDistances = "b!distances - display distances inbetween planets on a server"
         helpPortals = "b!portals - display portal requirements"
         helpUniverse = "b!universe - display a map of the universe, and the punk stargates"
-        description = "**1.- **`" + helpDistances + "`\n**2.- **`" + helpPortals + "`\n**3.- **`" + helpUniverse + "`\n**4.- **`b!help - show this message`\n**5.- **`!help - list all of the help sections`"
+        description = "**1.- **`" + helpDistances + "`\n**2.- **`" + helpPortals + "`\n**3.- **`" + helpUniverse + "`\n**4.- **`b!help - show this message`\n**5.- **`b!recipe - display the recipe for a specific item (enter its full name with spaces)`\n**6.- **`!help - list all of the help sections`"
         embed = discord.Embed(description = description, colour = 0xBECCE0)
         embed.set_author(name = title, icon_url = avatar_url)
         embed.set_footer(text="Enter a number to execute that command.")
@@ -34,6 +34,8 @@ async def on_message(message):
             elif response == 4:
                 await binfo()
             elif response == 5:
+                await brecipes()
+            elif response == 6:
                 await info()
             else:
                 pass
