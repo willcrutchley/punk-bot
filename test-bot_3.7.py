@@ -1,4 +1,5 @@
 import asyncio, discord, os, pickle
+from prettytable import PrettyTable
 TOKEN = 'NDY4ODM1NDAxODE0MTE0MzA0.DjAHiA.Y-6dmYg3pTb52vYfwwRg1ifXWFc'
 
 client = discord.Client()
@@ -81,29 +82,58 @@ async def on_message(message):
                 n = 0
                 inputItems = []
                 inputQuantities = []
+                skills = []
                 while True:
                     try:
                         inputItems.append(inputs[n]["inputItem"])
                         inputQuantities.append(inputs[n]["inputQuantity"])
                         n += 1
                     except:
+                        skills.append(data["recipes"][index]["prerequisites"])
+                        machine = data["recipes"][index]["machine"]
+                        hand = data["recipes"][index]["canHandCraft"]
+                        duration = data["recipes"][index]["duration"]
+                        power = data["recipes"][index]["powerRequired"]
+                        spark = data["recipes"][index]["spark"]
+                        wear = data["recipes"][index]["wear"]
+                        output = data["recipes"][index]["outputItem"]
+                        outputNum = data["recipes"][index]["outputQuantity"]
                         break
+                out = PrettyTable(["Outputs:", "Normal", "Bulk", "Mass"])
+                out.add_row([output, outputNum[0], outputNum[1], outputNum[2]])
+                
+                table = PrettyTable(["Requires:", "Normal", "Bulk", "Mass"])
+                table.align["Requires:"] = "l"
                 for item in inputItems:
-                    await client.send_message(message.channel, item)
-                    await client.send_message(message.channel, inputQuantities[inputItems.index(item)])
+                    nor = inputQuantities[inputItems.index(item)][0]
+                    bul = inputQuantities[inputItems.index(item)][1]
+                    mas = inputQuantities[inputItems.index(item)][2]
+        
+                    table.add_row([item, nor, bul, mas])
+                table.add_row(["Spark", spark[0], spark[1], spark[2]])
+                table.add_row(["Power", power, power, power])
+                table.add_row(["Time", str(duration[0]) + 's', str(duration[1]) + 's', str(duration[2]) + 's'])
+
+                embed = discord.Embed(description = "`" + out.get_string() + "`" + "\n" + "`" + table.get_string() + "`", colour = 0xAE86C4)
+                embed.set_author(name = "Recipe for " + output, icon_url = avatar_url)
+                embed.set_footer(text = str(skills[0]) + "\n" + machine)
+
+                await client.send_message(message.channel, embed = embed)
+                
             else:
                 title = "Error!"
                 description = "There is no recipe for that item"
                 embed = discord.Embed(description = description, colour = 0xDC5A46)
-                embed.set_author(name = title, icon_url = avatar_url)
+                embed.set_author(name = str(title), icon_url = avatar_url)
                 await client.send_message(message.channel, embed = embed)
-    
+        
         except:
             title = "Incorrect usage!"
             description = "The correct usage is `b!recipe outputItem`"
             embed = discord.Embed(description = description, colour = 0xDC5A46)
             embed.set_author(name = title, icon_url = avatar_url)
             await client.send_message(message.channel, embed = embed)
+        
 
     async def bdistance(server):
             title = "Here are the distances between planets on Boundless' " + server + " server:"
