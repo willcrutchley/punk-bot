@@ -1,6 +1,6 @@
 import asyncio, discord, os, pickle
 from prettytable import PrettyTable
-TOKEN = 'NDY4ODM1NDAxODE0MTE0MzA0.DjAHiA.Y-6dmYg3pTb52vYfwwRg1ifXWFc'
+TOKEN = "YOUR_TOKEN"
 
 client = discord.Client()
 
